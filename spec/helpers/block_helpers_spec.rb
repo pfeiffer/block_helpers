@@ -110,6 +110,12 @@ module TestHelperModule
       end
     end
   end
+  
+  class NeverRenderHelper < BlockHelpers::Base
+    def render?
+      false
+    end
+  end
 end
 
 describe TestHelperModule do
@@ -292,6 +298,28 @@ describe TestHelperModule do
           <% end %>
         <% end %>
       )).should match_html("Outer Inner bad egg nil BAD EGG NIL")
+    end
+  end
+  
+  describe "halt rendering of block helpers" do
+    it "should not render anything" do
+      eval_erb(%(
+        <% never_render_helper do |o| %>
+          Hello!
+        <% end %>
+      )).should match_html("")
+    end
+    
+    it "should not execute code in the block" do
+      eval_erb(%(
+        <% @executed = false %>
+
+        <% never_render_helper do |o| %>
+          <% @executed = true %>
+        <% end %>
+        
+        <% if @executed %>FAIL<% end %>
+      )).should_not match_html("FAIL")
     end
   end
 end

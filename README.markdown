@@ -206,6 +206,48 @@ In the view:
 However... I'd be careful not to abuse this, as the code could end up more confusing than it needs be.
 Nested block helpers can access the parent block helper by using the `parent` method.
 
+Halting rendering
+=================
+If you have logic in your helper that determine wether or not content should be displayed, then there
+are two ways of doing this.
+
+The following method does not render the body, BUT it does execute the block you pass to the block_helper:
+
+In the helper:
+
+    module AdvertisementHelper
+      class ArticleAdvertisement < BlockHelpers::Base
+        
+        # ....code....
+        
+        def display(body)
+          body unless some_failing_condition
+        end
+      end
+    end
+
+In the view:
+
+    <% article_advertisement(@article) do |ad| %>
+      <div class="ad468x80"><%= ad.javascript_include %></div>
+    <% end %>
+
+If you want to stop the block from being executed, you can overwrite the `render?` method in your helper.
+
+In the helper:
+
+    module AdvertisementHelper
+      class ArticleAdvertisement < BlockHelper::Base
+        
+        # ....code....
+        
+        def render?
+          some_method ? true : false
+        end
+      end
+    end
+
+
 Testing
 =======
 I'm not too sure about other testing frameworks, but with rspec-rails you can use 'eval_erb', e.g.

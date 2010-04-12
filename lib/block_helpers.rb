@@ -37,19 +37,22 @@ module BlockHelpers
             renderer.send(:helper=, top_level_helper)
             renderer.send(:parent=, parent_block_helper)
 
-            body = block ? capture(renderer, &block) : nil
-            processed_body = renderer.display(body)
-            if processed_body
+            if renderer.render?
+              body = block ? capture(renderer, &block) : nil
+              processed_body = renderer.display(body) 
+              if processed_body
 
-              # If concat is the old rails/merb version with 2 args...
-              if top_level_helper.method(:concat).arity == 2
-                concat processed_body, binding
-              # ...otherwise call with one arg
-              else
-                concat processed_body
-              end
+                # If concat is the old rails/merb version with 2 args...
+                if top_level_helper.method(:concat).arity == 2
+                  concat processed_body, binding
+                # ...otherwise call with one arg
+                else
+                  concat processed_body
+                end
               
+              end
             end
+            
             renderer
           end
         )
@@ -57,6 +60,10 @@ module BlockHelpers
       
       attr_accessor :current_helper, :current_parent_block_helper
     
+    end
+
+    def render?
+      true
     end
 
     def display(body)
