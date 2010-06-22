@@ -45,7 +45,8 @@ module BlockHelpers
                   concat processed_body, binding
                 # ...otherwise call with one arg
                 else
-                  concat processed_body
+                  #concat processed_body
+                  return
                 end
               
               end
